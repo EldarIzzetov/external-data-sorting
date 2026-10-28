@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Внешняя сортировка данных — демонстрация</title>
+<style>
+:root{--navy:#142844;--blue:#287cf0;--green:#159b70;--purple:#8250d8;--ink:#172b4d;--muted:#526783;--line:#dce8f8;--bg:#f4f8fd}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,Segoe UI,Arial,sans-serif;line-height:1.55}
+header{background:linear-gradient(110deg,#142844,#233e61);color:white;padding:15px max(22px,calc((100% - 1240px)/2));display:flex;align-items:center;justify-content:space-between;gap:22px;position:sticky;top:0;z-index:5;box-shadow:0 3px 15px #10233b22}
+.brand{font-size:20px;font-weight:750;display:flex;gap:12px;align-items:center;white-space:nowrap}.brand-icon{font-size:27px}nav{display:flex;gap:20px;flex-wrap:wrap}nav a{color:#dce9fa;text-decoration:none;font-size:14px}nav a:hover{color:white}
+main{max-width:1240px;margin:auto;padding:28px 22px 50px}.intro{margin-bottom:20px}.intro h1{font-size:clamp(25px,3vw,34px);margin:0 0 6px}.intro p{margin:4px 0;color:var(--muted);font-size:16px}
+.layout{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}.card{background:white;border:1px solid var(--line);border-radius:13px;padding:18px;box-shadow:0 3px 12px #1c3b6410;min-width:0}.card h2{font-size:17px;margin:0 0 10px;display:flex;gap:9px;align-items:center}.num{background:#e9f2ff;color:var(--blue);border-radius:8px;padding:5px 9px;font-size:15px}.hint{color:var(--muted);font-size:14px;margin:0 0 12px}
+textarea,input,select{font:inherit;color:var(--ink);border:1px solid #cbd9ec;border-radius:8px;background:#fbfdff;padding:10px;width:100%;outline:none}textarea:focus,input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #287cf01c}textarea{resize:vertical;min-height:175px;font-family:ui-monospace,Consolas,monospace;font-size:14px}
+.controls{display:flex;gap:9px;flex-wrap:wrap;margin-top:10px}.btn{border:0;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;transition:.15s}.btn:hover{transform:translateY(-1px)}.primary{background:var(--blue);color:white}.secondary{background:#fff;border:1px solid #cad8ea;color:var(--ink)}.small{font-size:13px;padding:7px 10px}.setting{display:flex;align-items:center;gap:10px;margin-top:12px;font-size:13px;color:var(--muted)}.setting input{width:72px}
+.steps{display:grid;gap:10px}.step{border-radius:10px;padding:12px;display:grid;grid-template-columns:36px 1fr;gap:10px;border:1px solid}.step b{display:block;margin-bottom:2px}.step p{font-size:13px;margin:0}.step .bubble{height:34px;width:34px;border-radius:50%;display:grid;place-items:center;color:white;font-weight:800}.s1{background:#f1f7ff;border-color:#cfe2ff}.s1 .bubble{background:var(--blue)}.s2{background:#effbf6;border-color:#c8f0df}.s2 .bubble{background:var(--green)}.s3{background:#f7f2ff;border-color:#e4d6ff}.s3 .bubble{background:var(--purple)}.arrow{text-align:center;color:#6e819c;font-size:22px;line-height:1}
+.status{padding:11px 12px;border-radius:9px;background:#eafaf3;border:1px solid #c3eedc;color:#087c58;font-size:13px;margin-bottom:12px}.status.error{background:#fff1f1;border-color:#ffd0d0;color:#ad3434}.status.wait{background:#f0f5fc;border-color:#d8e4f4;color:#405a79}
+.resultbox{border:1px solid var(--line);border-radius:8px;padding:10px;background:#fbfdff}.resultbox label{font-size:13px;font-weight:700;display:block;margin-bottom:7px}.resultbox textarea{min-height:150px;background:white}
+.fileinfo{background:#f1f7ff;border:1px solid #d8e7fc;border-radius:8px;padding:10px;margin-top:12px;font-size:13px}.fileinfo code{font-family:ui-monospace,monospace}
+.lower{display:grid;grid-template-columns:1.15fr .9fr;gap:16px;margin-top:16px}.codebox{background:#172536;color:#dbe8fa;border-radius:9px;overflow:hidden}.codebox pre{padding:16px;margin:0;overflow:auto;max-height:390px;font-size:13px;line-height:1.65;white-space:pre}.codebar{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 13px;background:#20334a;border-top:1px solid #3a4b61;font-size:13px}.codebar button{background:none;border:0;color:#cde2ff;cursor:pointer;font:inherit}.explain{font-size:14px;color:var(--muted)}.example{border:1px solid #cfe2ff;background:#f4f9ff;border-radius:9px;padding:12px;margin-top:13px}.example h3{font-size:14px;margin:0 0 8px;color:#235da8}.twocol{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px}.twocol pre{white-space:pre-wrap;margin:4px 0 0;color:#25415f}.usebox{border:1px solid #e0d0ff;background:#faf6ff;border-radius:9px;padding:12px;margin-top:12px}.usebox h3{margin:0 0 5px;color:#7041c4;font-size:14px}.usebox p{font-size:13px;margin:0;color:#5c4c78}
+.section{margin-top:22px}.section-title{font-size:23px;margin:0 0 12px}.uses{display:grid;grid-template-columns:repeat(4,1fr);gap:13px}.usecard{padding:16px;background:white;border:1px solid var(--line);border-radius:12px}.usecard .emoji{font-size:25px}.usecard h3{font-size:15px;margin:7px 0 5px}.usecard p{font-size:13px;color:var(--muted);margin:0}.comparison{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;border:1px solid var(--line)}.comparison th,.comparison td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px}.comparison th{background:#edf4fd}.comparison tr:last-child td{border-bottom:0}.footer{text-align:center;color:#71829a;font-size:13px;padding:25px 0 0}
+@media(max-width:900px){header{align-items:flex-start;flex-direction:column;position:static}.layout{grid-template-columns:1fr 1fr}.layout .card:last-child{grid-column:1/-1}.lower{grid-template-columns:1fr}.uses{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){main{padding:20px 13px}.layout{grid-template-columns:1fr}.layout .card:last-child{grid-column:auto}.uses{grid-template-columns:1fr}nav{gap:12px}.brand{white-space:normal;font-size:18px}.twocol{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><span class="brand-icon">▤</span> Внешняя сортировка данных</div>
+  <nav><a href="#demo">Демонстрация</a><a href="#how">Как работает</a><a href="#code">Код</a><a href="#usage">Применение</a></nav>
+</header>
+<main>
+  <section class="intro">
+    <h1>Демонстрация внешней сортировки данных</h1>
+    <p>Посмотрите, как алгоритм внешней сортировки слиянием упорядочивает числа из текстового файла.</p>
+    <p>Введите свои числа, выберите размер части и запустите интерактивную демонстрацию.</p>
+  </section>
+
+  <section class="layout" id="demo">
+    <article class="card">
+      <h2><span class="num">1</span> Исходные данные</h2>
+      <p class="hint">Каждое целое число должно быть на отдельной строке. Можно загрузить текстовый файл.</p>
+      <textarea id="inputData" aria-label="Исходные числа">8
+3
+10
+1
+7
+2
+15
+4</textarea>
+      <div class="controls">
+        <button class="btn primary" id="sortBtn">▶ Запустить сортировку</button>
+        <button class="btn secondary" id="resetBtn">↻ Сбросить</button>
+        <label class="btn secondary small" for="fileInput">↑ Загрузить файл</label>
+        <input type="file" id="fileInput" accept=".txt,.csv,text/plain" hidden>
+      </div>
+      <div class="setting"><label for="chunkSize">Размер части (чисел):</label><input id="chunkSize" type="number" min="1" max="10000" value="3"></div>
+      <p class="hint" style="margin-top:9px">Для примера используется маленький размер части, чтобы этапы были хорошо видны.</p>
+    </article>
+
+    <article class="card">
+      <h2><span class="num">2</span> Процесс сортировки</h2>
+      <p class="hint">Алгоритм делит данные на части, сортирует их отдельно и затем сливает.</p>
+      <div class="steps">
+        <div class="step s1"><div class="bubble">1</div><div><b>Разделение файла</b><p>Числа читаются небольшими частями, которые помещаются в оперативную память.</p></div></div>
+        <div class="arrow">↓</div>
+        <div class="step s2"><div class="bubble">2</div><div><b>Сортировка частей</b><p>Каждая часть сортируется отдельно и сохраняется как временный результат.</p></div></div>
+        <div class="arrow">↓</div>
+        <div class="step s3"><div class="bubble">3</div><div><b>Слияние</b><p>Отсортированные части объединяются в одну последовательность.</p></div></div>
+      </div>
+      <div class="fileinfo" id="partsInfo">После запуска здесь появятся части, полученные из исходных данных.</div>
+    </article>
+
+    <article class="card">
+      <h2><span class="num">3</span> Результат</h2>
+      <div class="status wait" id="status" role="status">Ожидание запуска. Нажмите «Запустить сортировку».</div>
+      <div class="resultbox">
+        <label for="outputData">Отсортированные данные</label>
+        <textarea id="outputData" readonly placeholder="Здесь появятся числа по возрастанию…"></textarea>
+      </div>
+      <div class="fileinfo"><b>Файлы демонстрации</b><br>Входной файл: <code>numbers.txt</code><br>Результат: <code>sorted_numbers.txt</code><div class="controls"><button class="btn secondary small" id="downloadBtn" disabled>↓ Скачать результат</button></div></div>
+    </article>
+  </section>
+
+  <section class="lower">
+    <article class="card" id="code">
+      <h2>〈/〉 Код программы (Python)</h2>
+      <p class="hint">Ниже приведён пример реализации, который можно сохранить как <code>external_sort.py</code>.</p>
+      <div class="codebox">
+        <pre id="pythonCode">import heapq
+import tempfile
+import os
+
+
+def external_sort(input_file, output_file, chunk_size=1000):
+    temp_files = []
+
+    try:
+        # 1. Читаем и сортируем данные частями
+        with open(input_file, "r", encoding="utf-8") as source:
+            while True:
+                chunk = []
+
+                for _ in range(chunk_size):
+                    line = source.readline()
+                    if not line:
+                        break
+                    chunk.append(int(line.strip()))
+
+                if not chunk:
+                    break
+
+                chunk.sort()
+
+                temp = tempfile.NamedTemporaryFile(
+                    mode="w", encoding="utf-8", delete=False
+                )
+                temp_files.append(temp.name)
+
+                with temp:
+                    for number in chunk:
+                        temp.write(f"{number}\\n")
+
+        # 2. Сливаем отсортированные части
+        with open(output_file, "w", encoding="utf-8") as result:
+            files = [open(name, "r", encoding="utf-8")
+                     for name in temp_files]
+            try:
+                for number in heapq.merge(
+                    *(map(int, f) for f in files)
+                ):
+                    result.write(f"{number}\\n")
+            finally:
+                for f in files:
+                    f.close()
+
+    finally:
+        # 3. Удаляем временные файлы
+        for name in temp_files:
+            if os.path.exists(name):
+                os.remove(name)
+
+
+if __name__ == "__main__":
+    external_sort("numbers.txt", "sorted_numbers.txt", 3)
+    print("Сортировка завершена!")</pre>
+        <div class="codebar"><button id="copyCode">Копировать код</button><span>Python 3</span></div>
+      </div>
+    </article>
+    <article class="card" id="how">
+      <h2>💡 Как это работает?</h2>
+      <p class="explain">Внешняя сортировка применяется, когда весь набор данных не помещается в оперативную память. Вместо загрузки целого файла программа обрабатывает небольшие части и использует диск для промежуточных результатов.</p>
+      <div class="example">
+        <h3>Пример результата</h3>
+        <div class="twocol"><div><b>Исходные числа</b><pre id="miniInput">8
+3
+10
+1
+7
+2
+15
+4</pre></div><div><b>После сортировки</b><pre id="miniOutput">1
+2
+3
+4
+7
+8
+10
+15</pre></div></div>
+      </div>
+      <div class="usebox" id="usage"><h3>✦ Где применяется?</h3><p>В базах данных, обработке серверных журналов, анализе больших данных, построении поисковых индексов и сортировке больших наборов записей.</p></div>
+    </article>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Внутренняя и внешняя сортировка</h2>
+    <table class="comparison"><thead><tr><th>Критерий</th><th>Внутренняя сортировка</th><th>Внешняя сортировка</th></tr></thead><tbody>
+      <tr><td>Где находятся данные</td><td>В оперативной памяти</td><td>Части в памяти, промежуточные данные на диске</td></tr>
+      <tr><td>Размер набора</td><td>Должен помещаться в RAM</td><td>Может превышать объём RAM</td></tr>
+      <tr><td>Главное ограничение</td><td>Объём памяти</td><td>Чтение и запись на накопитель</td></tr>
+      <tr><td>Пример</td><td>Сортировка небольшого списка</td><td>Сортировка очень большого файла</td></tr>
+    </tbody></table>
+  </section>
+  <section class="section">
+    <h2 class="section-title">Вывод</h2>
+    <article class="card"><p style="margin:0">Внешняя сортировка слиянием позволяет упорядочивать большие объёмы данных, обрабатывая их частями. Сначала отдельные части сортируются, затем объединяются в общий результат. Такой метод помогает работать с файлами, которые не помещаются целиком в оперативную память.</p></article>
+  </section>
+  <div class="footer">Учебный проект по информатике · «Внешняя сортировка данных»</div>
+</main>
+<script>
+const input = document.getElementById('inputData');
+const output = document.getElementById('outputData');
+const statusBox = document.getElementById('status');
+const partsInfo = document.getElementById('partsInfo');
+const downloadBtn = document.getElementById('downloadBtn');
+const defaultData = '8\n3\n10\n1\n7\n2\n15\n4';
+let sortedResult = null;
+
+function setStatus(message, kind='wait') {
+  statusBox.textContent = message;
+  statusBox.className = 'status ' + kind;
+}
+function parseNumbers(text) {
+  const tokens = text.trim().split(/[\s,;]+/).filter(Boolean);
+  if (!tokens.length) throw new Error('Добавьте хотя бы одно целое число.');
+  const nums = tokens.map(token => {
+    if (!/^[+-]?\d+$/.test(token)) throw new Error('Не удалось прочитать значение «' + token + '». Используйте целые числа.');
+    const n = Number(token);
+    if (!Number.isSafeInteger(n)) throw new Error('Число выходит за допустимый диапазон JavaScript.');
+    return n;
+  });
+  return nums;
+}
+function runSort() {
+  try {
+    const numbers = parseNumbers(input.value);
+    const size = Number(document.getElementById('chunkSize').value);
+    if (!Number.isInteger(size) || size < 1 || size > 10000) throw new Error('Размер части должен быть целым числом от 1 до 10000.');
+    const chunks = [];
+    for (let i=0; i<numbers.length; i+=size) {
+      chunks.push(numbers.slice(i, i+size).sort((a,b)=>a-b));
+    }
+    const streams = chunks.map(chunk => ({items:chunk, index:0}));
+    const merged = [];
+    // Имитация слияния отсортированных частей: на каждом шаге выбираем минимальный текущий элемент.
+    while (true) {
+      let best = -1;
+      for (let i=0; i<streams.length; i++) {
+        if (streams[i].index >= streams[i].items.length) continue;
+        if (best === -1 || streams[i].items[streams[i].index] < streams[best].items[streams[best].index]) best = i;
+      }
+      if (best === -1) break;
+      merged.push(streams[best].items[streams[best].index++]);
+    }
+    sortedResult = merged;
+    output.value = merged.join('\n');
+    document.getElementById('miniInput').textContent = numbers.join('\n');
+    document.getElementById('miniOutput').textContent = merged.join('\n');
+    partsInfo.innerHTML = '<b>Отсортированные части ('+chunks.length+')</b><br>' +
+      chunks.map((c,i)=>'<div style="margin-top:5px">Часть '+(i+1)+': <code>'+c.join(', ')+'</code></div>').join('');
+    setStatus('Сортировка успешно завершена! Чисел: '+numbers.length+'. Все данные упорядочены по возрастанию.', 'success');
+    downloadBtn.disabled = false;
+  } catch (err) {
+    sortedResult = null;
+    output.value = '';
+    downloadBtn.disabled = true;
+    setStatus(err.message, 'error');
+  }
+}
+document.getElementById('sortBtn').addEventListener('click', runSort);
+document.getElementById('resetBtn').addEventListener('click', () => {
+  input.value = defaultData;
+  output.value = '';
+  sortedResult = null;
+  downloadBtn.disabled = true;
+  partsInfo.textContent = 'После запуска здесь появятся части, полученные из исходных данных.';
+  document.getElementById('miniInput').textContent = defaultData;
+  document.getElementById('miniOutput').textContent = 'Нажмите «Запустить сортировку».';
+  setStatus('Ожидание запуска. Нажмите «Запустить сортировку».', 'wait');
+});
+document.getElementById('fileInput').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  try { input.value = await file.text(); setStatus('Файл загружен: '+file.name+'. Запустите сортировку.', 'wait'); }
+  catch { setStatus('Не удалось прочитать файл.', 'error'); }
+  e.target.value = '';
+});
+downloadBtn.addEventListener('click', () => {
+  if (!sortedResult) return;
+  const blob = new Blob([sortedResult.join('\n')+'\n'], {type:'text/plain;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'sorted_numbers.txt'; a.click();
+  URL.revokeObjectURL(url);
+});
+document.getElementById('copyCode').addEventListener('click', async () => {
+  const text = document.getElementById('pythonCode').textContent;
+  const button = document.getElementById('copyCode');
+  try { await navigator.clipboard.writeText(text); button.textContent = 'Скопировано!'; }
+  catch { button.textContent = 'Выделите код вручную'; }
+  setTimeout(()=>button.textContent='Копировать код',1800);
+});
+runSort();
+</script>
+</body>
+</html>
